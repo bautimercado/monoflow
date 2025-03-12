@@ -63,3 +63,32 @@ def train_recommendation_model(
 
     print(f"Modelo entrenado y guardado en '{output_path}'")
 
+
+def get_recommendations(movie_id, top_n=5, model_path="scripts/training/model/"):
+
+    matrix_path = os.path.join(model_path, "similarity_matrix.joblib")
+    movies_path = os.path.join(model_path, "movies_ids.csv")
+
+    similarity_matrix = joblib.load(matrix_path)
+    movies_df = pd.read_csv(movies_path)
+
+    # Encontrar índice de pelicula
+    try:
+        movie_idx = movies_df[movies_df["movieId"] == movie_id].index[0]
+    except IndexError:
+        return f"Película con ID {movie_id} no encontrada."
+
+    # Obtener puntuaciones de similitud y ordenar
+    sim_scores = list(enumerate(similarity_matrix[movie_idx]))
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    sim_scores = sim_scores[1:top_n+1]   # Sacar a la propia peli
+
+    # Sacar índices y puntuaciones
+    movie_indexes = [i[o] for i in sim_scores]
+    similarity_scores = [i[1] for i in sim_scores]
+
+    # Crear DataFrame de resultados
+    recommendations = movies_df.iloc[movie_indexes].copy()
+    recommendations["similarity_score"] = similarity_scores
+
+    return recommendations
