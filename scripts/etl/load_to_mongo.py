@@ -32,13 +32,14 @@ def load_to_mongodb():
 
         # Verificar conexión
         client.admin.command("ping")
+        client.server_info()
         print("Conexión a MongoDB establecida")
 
         db = client.movie_recommender
         collection = db.movies
 
         print("Cargando datos...")
-        df = pd.read_csv("../datasets/cleaned_movies.csv")
+        df = pd.read_csv("scripts/datasets/cleaned_movies.csv")
 
         if isinstance(df["genres"].iloc[0], str):
             print("Convirtiendo géneros a listas...")

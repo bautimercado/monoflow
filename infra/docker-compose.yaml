@@ -8,23 +8,23 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+  #redis:
+  #  image: redis:alpine
+  #  ports:
+  #    - "6379:6379"
+  #  volumes:
+  #    - redis_data:/data
 
-  recommendation-svc:
-    build: ../backend/recommendation-svc
-    ports:
-      - "5000:5000"
-    environment:
-      - MONGODB_URI=mongodb://mongodb:27017
-      - REDIS_URI=redis://redis:6379
-    depends_on:
-      - mongodb
-      - redis
+  #recommendation-svc:
+  #  build: ../backend/recommendation-svc
+  #  ports:
+  #    - "5000:5000"
+  #  environment:
+  #    - MONGODB_URI=mongodb://mongodb:27017
+  #    - REDIS_URI=redis://redis:6379
+  #  depends_on:
+  #    - mongodb
+  #    - redis
 
 volumes:
   mongodb_data:
