@@ -3,6 +3,23 @@ import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 
 def clean_movies_data(input_path="datasets/movies.csv", output_path="datasets/cleaned_movies.csv"):
+    """
+    Procesa y limpia datos de películas del dataset MovieLens.
+    
+    Esta función realiza las siguientes operaciones:
+    - Extrae el año del título y lo coloca en una columna separada
+    - Limpia el título removiendo el año y espacios extras
+    - Convierte géneros de formato separado por "|" a una lista
+    - Codifica géneros usando one-hot encoding
+    - Maneja valores faltantes y detecta posibles duplicados
+    
+    Args:
+        input_path (str): Ruta al archivo CSV original de películas
+        output_path (str): Ruta donde guardar el archivo CSV limpio
+        
+    Returns:
+        pandas.DataFrame: DataFrame con los datos de películas procesados
+    """
 
     df = pd.read_csv(input_path, encoding="utf-8")
 
