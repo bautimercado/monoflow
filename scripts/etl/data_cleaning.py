@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 
-def clean_movies_data(input_path="datasets/movies.csv", output_path="datasets/cleaned_movies.csv"):
+def clean_movies_data(
+        input_path="scripts/datasets/movies.csv",
+        output_path="scripts/datasets/cleaned_movies.csv"
+    ):
     """
     Procesa y limpia datos de películas del dataset MovieLens.
     
@@ -16,9 +19,6 @@ def clean_movies_data(input_path="datasets/movies.csv", output_path="datasets/cl
     Args:
         input_path (str): Ruta al archivo CSV original de películas
         output_path (str): Ruta donde guardar el archivo CSV limpio
-        
-    Returns:
-        pandas.DataFrame: DataFrame con los datos de películas procesados
     """
 
     df = pd.read_csv(input_path, encoding="utf-8")
@@ -43,7 +43,7 @@ def clean_movies_data(input_path="datasets/movies.csv", output_path="datasets/cl
     )
 
     # Añadir columnas para verificación
-    df["num_genres"] = df["genres_list"].apply(len)
+    df["num_genres"] = df["genres"].apply(len)
 
     # Unir DataFrames
     df = pd.concat([df, genres_encoded], axis=1)
