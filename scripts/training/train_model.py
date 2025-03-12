@@ -11,6 +11,13 @@ def train_recommendation_model(
         input_path="scripts/datasets/cleaned_data.csv",
         output_path="scripts/training/model/"
 ):
+    """
+    Entrena un modelo de recomendación basado en similitud de géneros.
+    
+    Args:
+        input_path (str): Ruta al archivo CSV de películas procesadas
+        output_dir (str): Directorio donde guardar el modelo y datos auxiliares
+    """
 
     print(f"Cargando datos desde {input_path}...")
     df = pd.read_csv(input_path)
@@ -65,7 +72,17 @@ def train_recommendation_model(
 
 
 def get_recommendations(movie_id, top_n=5, model_path="scripts/training/model/"):
-
+    """
+    Obtiene recomendaciones para una película basadas en similitud de géneros.
+    
+    Args:
+        movie_id (int): ID de la película para la que se buscan recomendaciones
+        top_n (int): Número de recomendaciones a devolver
+        model_dir (str): Directorio donde está guardado el modelo
+        
+    Returns:
+        pandas.DataFrame: DataFrame con las películas recomendadas
+    """
     matrix_path = os.path.join(model_path, "similarity_matrix.joblib")
     movies_path = os.path.join(model_path, "movies_ids.csv")
 
@@ -84,7 +101,7 @@ def get_recommendations(movie_id, top_n=5, model_path="scripts/training/model/")
     sim_scores = sim_scores[1:top_n+1]   # Sacar a la propia peli
 
     # Sacar índices y puntuaciones
-    movie_indexes = [i[o] for i in sim_scores]
+    movie_indexes = [i[0] for i in sim_scores]
     similarity_scores = [i[1] for i in sim_scores]
 
     # Crear DataFrame de resultados
