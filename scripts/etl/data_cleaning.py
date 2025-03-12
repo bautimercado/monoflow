@@ -6,19 +6,39 @@ def clean_movies_data(input_path="datasets/movies.csv", output_path="datasets/cl
 
     df = pd.read_csv(input_path, encoding="utf-8")
 
-    df["year"] = df["title"].str.extract(r"\((\d{4})\)")  # Extrae años entre paréntesis
-    df["title"] = df["title"].str.replace(r"\(\d{4}\)", "", regex=True)  # Elimina año del título
-    df["title"] = df["title"].str.strip()  # Elimina espacios sobrantes
+    # Extraer año del título
+    df["year"] = df["title"].str.extract(r"\((\d{4}(?:-\d{4})?)\)(?=[^()]*$)")
 
-    df["genres"] = df["genres"].str.split("|")  # Convertir a lista
-    df["genres"] = df["genres"].apply(lambda x: [] if x == ["(no genres listed)"] else x)  # Manejar casos sin géneros
+    # Eliminar año del título (solo el último par de paréntesis)
+    df["title"] = df["title"].str.replace(r"\s*\(\d{4}(?:-\d{4})?\)(?=[^()]*$)", "", regex=True)
+    df["title"] = df["title"].str.strip()
 
+    # Convertir generos a lista
+    df["genres"] = df["genres"].str.split("|")
+    df["genres"] = df["genres"].apply(lambda x: [] if x == ["(no genres listed)"] else x)
+
+    # Codificar generos (manteniendo la columna original)
     mlb = MultiLabelBinarizer()
-    genres_encoded = pd.DataFrame(mlb.fit_transform(df["genres"]), columns=mlb.classes_)
+    genres_encoded = pd.DataFrame(
+        mlb.fit_transform(df["genres"]),
+        columns=mlb.classes_,
+        index=df.index
+    )
+
+    # Añadir columnas para verificación
+    df["num_genres"] = df["genres_list"].apply(len)
+
+    # Unir DataFrames
     df = pd.concat([df, genres_encoded], axis=1)
 
-    df["year"] = df["year"].fillna("Unknown")  # Años desconocidos
-    df.dropna(subset=["title"], inplace=True)  # Eliminar filas sin título
+    # Manejar datos faltantes
+    df["year"] = df["year"].fillna("Unknown")
+    df.dropna(subset=["title"], inplace=True)
+
+    # Verificar posibles duplicados
+    potential_duplicates = df[df.duplicated(subset=["title"], keep=False)]
+    if not potential_duplicates.empty:
+        print(f"Se encontraron {len(potential_duplicates)} posibles peliculas duplicadas")
 
     df.to_csv(output_path, index=False, encoding="utf-8")
     print(f"Datos limpios guardados en: {output_path}")
