@@ -33,3 +33,7 @@ recomflow/
     docker-compose up --build
     ```
 
+## 📄 Licencia
+
+MIT License.
+
