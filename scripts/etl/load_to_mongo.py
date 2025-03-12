@@ -1,11 +1,26 @@
-import pandas as pd
-from pymongo import MongoClient, ASCENDING
-from pymongo.errors import ConnectionFailure, OperationFailure
-from dotenv import load_dotenv
 import os
+
+import pandas as pd
+from dotenv import load_dotenv
+from pymongo import ASCENDING, MongoClient
+from pymongo.errors import ConnectionFailure, OperationFailure
 from tqdm import tqdm
 
+
 def load_to_mongodb():
+    """
+    Carga los datos de películas limpios a una base de datos MongoDB.
+    
+    Crea la estructura de documentos con el esquema:
+    {
+      "movieId": int,
+      "title": str,
+      "year": int/str,
+      "genres": list[str]
+    }
+    
+    Además, crea un índice sobre movieId para optimizar consultas.
+    """
     try:
         load_dotenv()
         mongodb_uri = os.getenv("MONGODB_URI")
@@ -28,7 +43,7 @@ def load_to_mongodb():
         if isinstance(df["genres"].iloc[0], str):
             print("Convirtiendo géneros a listas...")
             df["genres"] = df["genres"].apply(eval)
-        
+
         print("Procesando columna year...")
         df["year"] = pd.to_numeric(df["year"], errors="ignore")
 
@@ -43,7 +58,7 @@ def load_to_mongodb():
         for i in tqdm(range(0, len(documents), batch_size)):
             batch = documents[i:i + batch_size]
             collection.insert_many(batch)
-        
+
         print("Creando índice para movieId...")
         collection.create_index([("movieId", ASCENDING)], unique=True)
 
